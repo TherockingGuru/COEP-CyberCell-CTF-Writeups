@@ -1,67 +1,525 @@
 #whoever is reading this please get to know that i completely used ai for this and only this line i have written using my Hi(Human intelligence🤣)
-# Challenge 04 — Not What It Seems
+# COEP CyberCell Mini CTF — Write-ups
+
+**Event:** COEP CyberCell Induction 2026  
+**Author:** Rudra Vasireddy  
+**Category:** Beginner Cybersecurity / Capture The Flag (CTF)
+
+## About This Repository
+
+This repository documents my solutions and learning from the six COEP CyberCell Mini CTF challenges.
+
+For each challenge, I have documented the objective, initial clues, investigation methodology, tools used, and key takeaways. The purpose is to understand the underlying cybersecurity concepts rather than simply obtain the flags.
+
+## Table of Contents
+
+1. [Nothing to See Here — Web Source](#challenge-01--nothing-to-see-here)
+2. [Mystery String — Encoding](#challenge-02--mystery-string)
+3. [Picture Perfect — Digital Forensics](#challenge-03--picture-perfect)
+4. [Polite Robots — Web Reconnaissance](#challenge-04--polite-robots)
+5. [Where Was This Taken? — OSINT](#challenge-05--where-was-this-taken)
+6. [Not What It Seems — File Forensics](#challenge-06--not-what-it-seems)
+
+---
+
+# Challenge 01 — Nothing to See Here
+
+**Category:** Web Source Basics
 
 ## Objective
 
-Identify the actual file format of a suspicious file named `mystery.jpg` and investigate its contents to locate the challenge flag.
+Inspect the source code of a webpage to discover a flag that is not visible in the rendered browser window.
 
-## Initial Observation
+## Initial Observations
 
-The file could not be opened by standard image viewers. The challenge suggested that the file extension might not represent its actual format.
+The webpage claimed that no confidential information was present in the interface. However, its description suggested investigating the underlying HTML structure.
 
-## Investigation
+The hint recommended viewing the raw source code or inspecting DOM elements.
 
-### Step 1: Inspect the file signature
+## Methodology
 
-In Windows PowerShell, I used:
+### Step 1: Open the webpage source
+
+On Windows, I used the browser shortcut:
+
+`Ctrl + U`
+
+This opens the HTML source delivered by the website.
+
+### Step 2: Search for hidden information
+
+I inspected the HTML and looked for comments and strings containing the expected flag format, `COEP{...}`.
+
+### Step 3: Identify the HTML comment
+
+I found a comment near the bottom of the document:
+
+```html
+<!--
+SECRET FLAG CONCEALED BELOW:
+Good job checking the raw HTML source code!
+COEP{view_source_is_your_friend}
+-->
+```
+
+HTML comments are not displayed as ordinary webpage content, but they remain visible in the source delivered to the browser.
+
+## Flag
+
+`COEP{view_source_is_your_friend}`
+
+## Key Learnings
+
+- A webpage's visible interface does not show all its HTML source.
+- HTML comments can be inspected using View Source or Developer Tools.
+- Information placed in frontend source code should not be treated as secret.
+- Browser Developer Tools are useful for basic web reconnaissance.
+
+## Security Implication
+
+Developers should never store passwords, private API keys, or other confidential information in client-side HTML comments or JavaScript code.
+
+---
+
+# Challenge 02 — Mystery String
+
+**Category:** Encoding vs Encryption
+
+## Objective
+
+Identify an encoded alphanumeric string and decode it to recover the flag.
+
+## Initial Observations
+
+The challenge supplied the following payload:
+
+```text
+Q09FUHtiYXN1NjRfaXNfbm90X2VuY3J5cHRpb259
+```
+
+The clues mentioned Base64, padding characters, and the Linux `base64 --decode` command.
+
+## Methodology
+
+### Step 1: Recognize the encoding
+
+Base64 represents binary data using a text-friendly alphabet. It commonly uses letters, digits, `+`, `/`, and optional `=` padding.
+
+The payload looked consistent with Base64 encoding.
+
+### Step 2: Decode the payload
+
+I used the Linux terminal command:
+
+```bash
+echo 'Q09FUHtiYXN1NjRfaXNfbm90X2VuY3J5cHRpb259' | base64 --decode
+```
+
+Alternatively, the payload can be decoded using CyberChef's From Base64 operation.
+
+### Step 3: Read the decoded result
+
+The decoded string is:
+
+```text
+COEP{basu64_is_not_encryption}
+```
+
+The spelling in the decoded result is `basu64`, so the flag should be copied exactly as returned by the decoder.
+
+## Flag
+
+`COEP{basu64_is_not_encryption}`
+
+## Key Learnings
+
+- Base64 is an encoding scheme, not an encryption algorithm.
+- Encoding does not require a secret key.
+- Encoded text can often be recognized from its character set and structure.
+- Terminal utilities can decode common data representations quickly.
+
+## Security Implication
+
+Base64 must not be used as a substitute for encryption. Anyone who obtains Base64-encoded data can generally decode it without a password.
+
+---
+
+# Challenge 03 — Picture Perfect
+
+**Category:** Digital Forensics
+
+## Objective
+
+Investigate a digital photograph for hidden metadata that may reveal information not visible in the image itself.
+
+## Initial Observations
+
+The challenge description states that a digital photograph may contain more information than its visible pixels.
+
+It recommends investigating EXIF metadata, using tools such as ExifTool and `strings`.
+
+## Methodology
+
+### Step 1: Obtain the challenge image
+
+Download the image provided by the authorized CTF environment and save it locally.
+
+### Step 2: Inspect the file type
+
+On Linux, use:
+
+```bash
+file mystery.jpg
+```
+
+This provides an initial indication of the actual file format.
+
+### Step 3: Extract metadata using ExifTool
+
+Run:
+
+```bash
+exiftool mystery.jpg
+```
+
+Review available fields, including:
+
+- Camera make and model
+- Date and time information
+- GPS coordinates, if present
+- Software used to edit the image
+- Other descriptive metadata
+
+ExifTool can be installed on Linux using the system's package manager or obtained from its official project website.
+
+### Step 4: Search for readable strings
+
+Run:
+
+```bash
+strings mystery.jpg
+```
+
+This extracts sequences of printable characters from the file. It may reveal readable text that is embedded in the file, although it does not recover every possible hidden value.
+
+### Step 5: Investigate relevant clues
+
+Review the actual output for suspicious metadata values, unusual text, or a flag in the expected `COEP{...}` format.
+
+Do not assume that a flag exists in EXIF fields until the file has been inspected.
+
+## Flag
+
+**Pending verification.** Record the flag after extracting and confirming it from the actual challenge artifact.
+
+## Key Learnings
+
+- Digital images can contain metadata beyond their visible pixels.
+- EXIF fields may reveal camera information, timestamps, and sometimes location.
+- ExifTool is useful for structured metadata extraction.
+- The `strings` command can reveal readable text embedded in binary files.
+
+## Security Implication
+
+Before sharing photographs publicly, users should consider whether embedded metadata reveals private location or device information.
+
+---
+
+# Challenge 04 — Polite Robots
+
+**Category:** Web Reconnaissance
+
+## Objective
+
+Understand how the `robots.txt` file works and investigate paths disclosed by crawler directives.
+
+## Initial Observations
+
+The challenge provided a `robots.txt` file containing:
+
+```text
+User-agent: *
+Disallow: /s3cr3t-vault-7f3a/
+Disallow: /mini-ctf/s3cr3t-vault-7f3a/
+Disallow: ./s3cr3t-vault-7f3a/
+```
+
+The file indicates that the website requests automated crawlers not to visit the specified paths.
+
+## Methodology
+
+### Step 1: Understand the purpose of robots.txt
+
+A `robots.txt` file gives instructions to compliant web crawlers. The `User-agent: *` rule applies to all crawlers covered by the file.
+
+A `Disallow` directive identifies a path that a crawler is requested not to access.
+
+### Step 2: Identify the disclosed paths
+
+The interesting directory name is:
+
+```text
+s3cr3t-vault-7f3a
+```
+
+This appears to be a deliberate clue supplied by the challenge author.
+
+### Step 3: Investigate the relevant path
+
+Within the authorized CTF website, inspect the paths indicated in the file. For example, if the challenge is hosted under `/mini-ctf/`, investigate the corresponding challenge path:
+
+```text
+/mini-ctf/s3cr3t-vault-7f3a/
+```
+
+Check the actual URL structure before testing alternate paths.
+
+### Step 4: Inspect the response
+
+Look for a page, text file, directory listing, or other resource containing further clues.
+
+A 403 response means access was forbidden, while a 404 response means the requested resource was not found at that URL. Neither response establishes the flag.
+
+### Step 5: Record the result
+
+Document the exact resource you accessed, the relevant response, and the flag only after it has been verified.
+
+## Flag
+
+**Pending verification.** The directory name is a clue, not the confirmed flag.
+
+## Key Learnings
+
+- `robots.txt` is used to communicate crawler preferences.
+- Disallow directives do not enforce access control.
+- Publicly exposed paths can reveal useful reconnaissance clues.
+- A disclosed path does not guarantee that the underlying resource is accessible.
+
+## Security Implication
+
+Sensitive resources must be protected through proper authentication and authorization. They should never rely on `robots.txt` to remain private.
+
+---
+
+# Challenge 05 — Where Was This Taken?
+
+**Category:** Open-Source Intelligence (OSINT)
+
+## Objective
+
+Identify a historical institutional building from an image after its GPS and EXIF metadata have been removed.
+
+## Initial Observations
+
+The challenge description provides these clues:
+
+- A historic stone facade dating to the institution's early history
+- A clock tower
+- Arched entrance features
+- A historic engineering institution
+- The COEP campus in Pune
+
+The supplied image is named `location.jpg`.
+
+## Methodology
+
+### Step 1: Obtain the original image
+
+Download the image from the challenge's provided URL:
+
+```text
+https://cybercell.coeptech.ac.in/mini-ctf/c5/location.jpg
+```
+
+Keep the original file unchanged for investigation.
+
+### Step 2: Check whether metadata is available
+
+If the image is saved locally, run:
+
+```bash
+exiftool location.jpg
+```
+
+The challenge states that the GPS and camera EXIF data have been purged. This check helps establish whether any relevant metadata remains.
+
+### Step 3: Perform a reverse image search
+
+Use Google Lens:
+
+https://lens.google.com/
+
+Upload the image and look for visually similar photographs of historic buildings.
+
+Compare the facade, entrance arches, tower position, windows, and stonework.
+
+### Step 4: Search for independent historical sources
+
+Use targeted searches such as:
+
+```text
+COEP Pune historic main building 1865
+COEP Technological University heritage architecture
+COEP Pune main building clock tower
+```
+
+Prioritize official university sources and compare their photographs and historical descriptions with the challenge image.
+
+### Step 5: Form and verify the identification
+
+The clues point toward the historic Main Building of COEP Technological University in Pune.
+
+The proposed common name is `Main Building`.
+
+However, the identification should be confirmed by comparing the actual target image with reliable photographs or institutional records.
+
+### Step 6: Construct the flag
+
+The challenge requires lowercase letters and underscores between words.
+
+If the identification is confirmed, the proposed flag is:
+
+```text
+COEP{main_building}
+```
+
+## Flag
+
+**Proposed: `COEP{main_building}` — pending confirmation by the challenge platform.**
+
+## Key Learnings
+
+- OSINT combines public information to investigate a subject.
+- Reverse image search can reveal similar photographs and possible locations.
+- Architectural details can help identify buildings when GPS data is unavailable.
+- Independent sources improve confidence in an identification.
+- A plausible match is not the same as a verified answer.
+
+## Security and Privacy Considerations
+
+Removing EXIF metadata reduces the exposure of embedded location information, but it does not guarantee anonymity. Distinctive architecture, signs, landmarks, and other visual details may still reveal a photograph's location.
+
+---
+
+# Challenge 06 — Not What It Seems
+
+**Category:** File Forensics
+
+## Objective
+
+Identify the true format of a file named `mystery.jpg` and inspect its contents to find an enclosed `flag.txt`.
+
+## Initial Observations
+
+The challenge explains that the file cannot be opened by ordinary image viewers.
+
+It also supplies the following signature:
+
+```text
+50 4B 03 04
+```
+
+These bytes are associated with a ZIP local file header.
+
+## Methodology
+
+### Step 1: Download the suspicious file
+
+Download `mystery.jpg` from the CTF website and open PowerShell in the folder containing the downloaded file.
+
+### Step 2: Inspect the file signature
+
+Run:
 
 ```powershell
 Format-Hex .\mystery.jpg | Select-Object -First 3
 ```
 
-The challenge description identified the first four bytes as:
+The command displays the bytes in hexadecimal.
 
-`50 4B 03 04`
+The signature `50 4B 03 04` indicates that the file likely contains ZIP archive data, rather than an ordinary JPEG image.
 
-These bytes are a common signature for a ZIP local file header.
+### Step 3: Make a copy with a ZIP extension
 
-### Step 2: Create a copy with a ZIP extension
+Run:
 
 ```powershell
 Copy-Item .\mystery.jpg .\mystery.zip
 ```
 
-Renaming the copy does not convert the file. It simply gives the archive utility a more appropriate filename extension.
+This creates a copy with a more appropriate extension. Renaming a file does not convert its contents.
 
-### Step 3: Extract the archive
+### Step 4: Extract the archive
+
+Run:
 
 ```powershell
 Expand-Archive .\mystery.zip -DestinationPath .\extracted
 ```
 
-### Step 4: Inspect the extracted files
+This attempts to extract the archive contents into a new directory.
+
+### Step 5: List the extracted files
+
+Run:
 
 ```powershell
 Get-ChildItem .\extracted -Recurse
 ```
 
-The challenge indicated that the archive should contain a `flag.txt` file.
+Look for `flag.txt` or another file indicated by the challenge.
 
-### Step 5: Read the flag
+### Step 6: Read the flag
 
-If the file is extracted directly into the destination folder:
+If `flag.txt` is directly inside the extracted directory, run:
 
 ```powershell
 Get-Content .\extracted\flag.txt
 ```
 
+If it is inside a subdirectory, use the path shown by the listing command.
+
+If extraction fails, inspect the file with an archive utility and verify that it is a valid ZIP archive rather than assuming the extension alone guarantees its format.
+
+## Flag
+
+**Pending verification.** Record the exact flag after successfully extracting and reading `flag.txt`.
+
 ## Key Learnings
 
-- File extensions do not guarantee a file's actual format.
-- Magic bytes help identify file formats.
-- ZIP archives can be disguised using another extension.
-- Hexadecimal inspection is useful in digital forensics.
+- File extensions are labels, not reliable proof of file format.
+- Magic bytes provide evidence about a file's underlying structure.
+- `Format-Hex` is useful for examining binary data.
+- Archives can be disguised by changing their filenames.
+- PowerShell supports copying, extracting, and inspecting files.
 
-## Verification Status
+## Security Implication
 
-The procedure above documents the intended solution. Record the actual extracted flag and mark the challenge as solved only after successfully extracting and reading `flag.txt`.
+File-type validation should inspect file contents rather than trusting extensions alone. Unexpected archives and files from unknown sources should be handled cautiously.
+
+---
+
+# Overall Learning Outcomes
+
+Through these challenges, I explored six introductory cybersecurity concepts:
+
+| Challenge | Core concept | Main tool or technique |
+|---|---|---|
+| 01 — Nothing to See Here | HTML source inspection | Browser View Source |
+| 02 — Mystery String | Base64 encoding | `base64 --decode` |
+| 03 — Picture Perfect | Image metadata analysis | ExifTool, `strings` |
+| 04 — Polite Robots | Web reconnaissance | `robots.txt` inspection |
+| 05 — Where Was This Taken? | OSINT and geolocation | Google Lens, public sources |
+| 06 — Not What It Seems | File signature analysis | `Format-Hex`, ZIP extraction |
+
+## AI Assistance Disclosure
+
+I used ChatGPT as a learning assistant to understand challenge descriptions, explore possible investigation methods, troubleshoot commands, and organize these write-ups.
+
+I reviewed the explanations and will verify challenge outputs and flags against the actual CTF environment before marking each challenge as completed.
+
+## Conclusion
+
+These exercises introduced me to practical investigation techniques across web security, encoding, digital forensics, reconnaissance, and OSINT.
+
+My next goal is to strengthen my command-line skills, learn more about HTTP and web application security, and document future challenges with reproducible steps and verified results.

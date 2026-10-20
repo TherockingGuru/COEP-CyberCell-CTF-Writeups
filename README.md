@@ -1,54 +1,31 @@
-# COEP-CyberCell-CTF-Writeups
-Documenting my beginner cybersecurity CTF challenges, investigation methods, tools, and key learnings
-# COEP CyberCell Mini CTF — My Solutions
+# COEP CyberCell Mini CTF — Write-ups
 
-## About This Repository
+**Event:** COEP CyberCell Induction 2026  
+**Category:** Beginner Cybersecurity / Capture The Flag (CTF)
 
-This repository documents my learning journey through the COEP CyberCell Mini Capture The Flag (CTF) challenges.
+## About
+This repository documents my learning from the six COEP CyberCell Mini CTF challenges. Each write-up describes the objective, clues, investigation method, tools, and lessons learned.
 
-The objective is to understand basic cybersecurity concepts, investigate clues, use appropriate tools, and document the methodology used to solve each challenge.
+> **Verification note:** Only mark a challenge as solved and publish a flag after reproducing the steps and confirming the result. These notes identify results that still need verification.
 
-Rather than focusing only on obtaining flags, I aim to explain the reasoning behind each solution and the lessons learned.
+## Challenges
+1. [Challenge 01 — Nothing to See Here](challenge-01-nothing-to-see-here.md)
+2. [Challenge 02 — Mystery String](challenge-02-mystery-string.md)
+3. [Challenge 03 — Picture Perfect](challenge-03-picture-perfect.md)
+4. [Challenge 04 — Polite Robots](challenge-04-polite-robots.md)
+5. [Challenge 05 — Where Was This Taken?](challenge-05-where-was-this-taken.md)
+6. [Challenge 06 — Not What It Seems](challenge-06-not-what-it-seems.md)
 
-## Topics Covered
+## Tools and Techniques
+- Browser View Source and Developer Tools
+- Base64 decoding
+- `robots.txt` inspection
+- ExifTool and `strings`
+- Reverse image search and public-source research
+- PowerShell `Format-Hex` and ZIP extraction
 
-- **Web Source Inspection:** Finding information hidden in HTML comments.
-- **Base64 Encoding:** Identifying and decoding Base64 strings.
-- **Robots.txt:** Understanding crawler directives and discovering publicly exposed paths.
-- **File Signature Analysis:** Identifying file formats using magic bytes and extracting archive contents.
-- **OSINT:** Using visual clues and public sources to identify a historical landmark.
+## AI Assistance Disclosure
+I used ChatGPT as a learning assistant to understand challenge descriptions, explore investigation methods, troubleshoot commands, and organize these notes. I will verify results against the actual CTF environment and ensure I understand the techniques before treating a challenge as completed.
 
-## Tools Used
-
-- Web browser and Developer Tools
-- Linux terminal commands
-- Windows PowerShell
-- Base64 decoder
-- File signature inspection using `Format-Hex`
-- ZIP archive extraction tools
-- Google Lens and public web searches for OSINT
-
-## Challenge Write-ups
-
-Each write-up will include:
-
-1. Challenge objective
-2. Initial observations and clues
-3. Tools and commands used
-4. Step-by-step methodology
-5. Flag, once verified
-6. Key learnings and security implications
-
-## Responsible Disclosure and Scope
-
-All activities documented here relate to authorized educational CTF challenges. Techniques are intended for learning and use in environments where I have permission to investigate.
-
-## AI Assistance
-
-I used ChatGPT as a learning assistant to understand cybersecurity concepts, interpret challenge clues, troubleshoot commands, and organize my notes.
-
-I am responsible for reviewing the explanations, verifying the results, and ensuring that I understand the techniques documented in this repository.
-
-## Learning Outcome
-
-These challenges introduced me to web source inspection, encoding, crawler directives, file signatures, archive analysis, and open-source intelligence. I will continue updating this repository as I complete more challenges and strengthen my cybersecurity fundamentals.
+## Responsible Use
+These notes concern authorized educational CTF challenges. Use the techniques only on systems and files you are authorized to investigate. Follow the organizers' rules before publishing flags or challenge solutions.

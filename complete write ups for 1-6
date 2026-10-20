@@ -1,0 +1,67 @@
+#whoever is reading this please get to know that i completely used ai for this and only this line i have written using my Hi(Human intelligence🤣)
+# Challenge 04 — Not What It Seems
+
+## Objective
+
+Identify the actual file format of a suspicious file named `mystery.jpg` and investigate its contents to locate the challenge flag.
+
+## Initial Observation
+
+The file could not be opened by standard image viewers. The challenge suggested that the file extension might not represent its actual format.
+
+## Investigation
+
+### Step 1: Inspect the file signature
+
+In Windows PowerShell, I used:
+
+```powershell
+Format-Hex .\mystery.jpg | Select-Object -First 3
+```
+
+The challenge description identified the first four bytes as:
+
+`50 4B 03 04`
+
+These bytes are a common signature for a ZIP local file header.
+
+### Step 2: Create a copy with a ZIP extension
+
+```powershell
+Copy-Item .\mystery.jpg .\mystery.zip
+```
+
+Renaming the copy does not convert the file. It simply gives the archive utility a more appropriate filename extension.
+
+### Step 3: Extract the archive
+
+```powershell
+Expand-Archive .\mystery.zip -DestinationPath .\extracted
+```
+
+### Step 4: Inspect the extracted files
+
+```powershell
+Get-ChildItem .\extracted -Recurse
+```
+
+The challenge indicated that the archive should contain a `flag.txt` file.
+
+### Step 5: Read the flag
+
+If the file is extracted directly into the destination folder:
+
+```powershell
+Get-Content .\extracted\flag.txt
+```
+
+## Key Learnings
+
+- File extensions do not guarantee a file's actual format.
+- Magic bytes help identify file formats.
+- ZIP archives can be disguised using another extension.
+- Hexadecimal inspection is useful in digital forensics.
+
+## Verification Status
+
+The procedure above documents the intended solution. Record the actual extracted flag and mark the challenge as solved only after successfully extracting and reading `flag.txt`.
